@@ -8,7 +8,7 @@
 
     <artifactId>aws-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>0.2.22-SNAPSHOT</version>
+    <version>ibrosoft-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -138,7 +138,7 @@
                 <version>3.5</version>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven</groupId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.7.1</version>
             </plugin>
@@ -186,4 +186,24 @@
             </plugins>
         </pluginManagement>
     </build>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>releases</id>
+            <name>releases</name>
+            <url>
+                https://nexus.travcorp.technology/content/repositories/releases
+            </url>
+            <layout>default</layout>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>snapshots</id>
+            <name>snapshots</name>
+            <url>
+                https://nexus.travcorp.technology/content/repositories/snapshots
+            </url>
+            <layout>default</layout>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

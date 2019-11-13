@@ -12,15 +12,6 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 @Mojo(name = "createS3Bucket")
 public final class S3BucketMojo extends AbstractMojo {
 
-	@Parameter(property = "awsAccessKey")
-	private String awsAccessKey;
-
-	@Parameter(property = "awsSecretAccessKey")
-	private String awsSecretAccessKey;
-
-	@Parameter(property = "serverId")
-	private String serverId;
-
 	@Parameter(property = "region")
 	private String region;
 
@@ -39,20 +30,13 @@ public final class S3BucketMojo extends AbstractMojo {
 	@Parameter(property = "httpsProxyPassword")
 	private String httpsProxyPassword;
 
-	@Parameter(defaultValue = "${settings}", readonly = true)
-	private Settings settings;
-
-	@Component
-	private SettingsDecrypter decrypter;
-
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		Proxy proxy = new Proxy(httpsProxyHost, httpsProxyPort, httpsProxyUsername, httpsProxyPassword);
 
 		S3Bucket bucket = new S3Bucket(getLog());
-		AwsKeyPair keyPair = Util.getAwsKeyPair(serverId, awsAccessKey, awsSecretAccessKey, settings, decrypter);
-		bucket.create(keyPair, region, bucketName, proxy);
+		bucket.create(region, bucketName, proxy);
 	}
 
 }

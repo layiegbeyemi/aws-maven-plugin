@@ -37,25 +37,6 @@ final class Util {
         return cc;
     }
 
-    static AwsKeyPair getAwsKeyPair(String serverId, String awsAccessKey, String awsSecretAccessKey,
-            Settings settings, SettingsDecrypter decrypter) throws MojoExecutionException {
-        final AwsKeyPair keys;
-        if (serverId != null) {
-            Server server = settings.getServer(serverId);
-            if (server == null) {
-                throw new MojoExecutionException("serverId not found in settings: " + serverId);
-            } else {
-                SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest(server);
-                SettingsDecryptionResult result = decrypter.decrypt(request);
-                keys = new AwsKeyPair(result.getServer().getUsername(),
-                        result.getServer().getPassword());
-            }
-        } else {
-            keys = new AwsKeyPair(awsAccessKey, awsSecretAccessKey);
-        }
-        return keys;
-    }
-    
     public static String formatJson(String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -65,5 +46,4 @@ final class Util {
             throw new RuntimeException(e);
         }
     }
-
 }

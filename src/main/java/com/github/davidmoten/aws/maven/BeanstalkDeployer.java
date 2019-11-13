@@ -6,9 +6,6 @@ import java.util.Date;
 import org.apache.maven.plugin.logging.Log;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalk;
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalkClientBuilder;
 import com.amazonaws.services.elasticbeanstalk.model.CreateApplicationVersionRequest;
@@ -25,15 +22,12 @@ final class BeanstalkDeployer {
         this.log = log;
     }
 
-    void deploy(File artifact, AwsKeyPair keyPair, String region, String applicationName, String environmentName,
+    void deploy(File artifact, String region, String applicationName, String environmentName,
             String versionLabel, Proxy proxy) {
-
-        final AWSCredentialsProvider credentials = new AWSStaticCredentialsProvider(
-                new BasicAWSCredentials(keyPair.key, keyPair.secret));
 
         ClientConfiguration cc = Util.createConfiguration(proxy);
 
-        AWSElasticBeanstalk eb = AWSElasticBeanstalkClientBuilder.standard().withCredentials(credentials)
+        AWSElasticBeanstalk eb = AWSElasticBeanstalkClientBuilder.standard()
                 .withClientConfiguration(cc).withRegion(region).build();
 
         String bucketName = getS3BucketName(eb);
@@ -42,7 +36,7 @@ final class BeanstalkDeployer {
 
         String objectName = artifact.getName() + "_" + dateTime;
 
-        uploadArtifact(artifact, credentials, region, cc, bucketName, objectName);
+        uploadArtifact(artifact, region, cc, bucketName, objectName);
 
         createApplicationVersion(applicationName, eb, bucketName, objectName, versionLabel);
 
@@ -56,9 +50,9 @@ final class BeanstalkDeployer {
         return bucketName;
     }
 
-    private void uploadArtifact(File artifact, final AWSCredentialsProvider credentials, final String region,
+    private void uploadArtifact(File artifact, final String region,
             ClientConfiguration cc, String bucketName, String objectName) {
-        AmazonS3 s3 = AmazonS3ClientBuilder.standard().withCredentials(credentials).withClientConfiguration(cc)
+        AmazonS3 s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cc)
                 .withRegion(region).build();
         log.info("uploading " + artifact + " to " + bucketName + ":" + objectName);
         s3.putObject(bucketName, objectName, artifact);

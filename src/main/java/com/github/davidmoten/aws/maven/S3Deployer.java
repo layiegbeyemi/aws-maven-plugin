@@ -11,9 +11,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.apache.maven.plugin.logging.Log;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AccessControlList;
@@ -29,15 +26,12 @@ final class S3Deployer {
         this.log = log;
     }
 
-    public void deploy(AwsKeyPair keyPair, String region, String inputDirectory, final String bucketName,
+    public void deploy(String region, String inputDirectory, final String bucketName,
             final String outputBasePath, Proxy proxy) {
-
-        final AWSCredentialsProvider credentials = new AWSStaticCredentialsProvider(
-                new BasicAWSCredentials(keyPair.key, keyPair.secret));
 
         ClientConfiguration cc = Util.createConfiguration(proxy);
 
-        final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withCredentials(credentials).withClientConfiguration(cc)
+        final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cc)
                 .withRegion(region).build();
 
         if (inputDirectory == null) {
@@ -70,7 +64,5 @@ final class S3Deployer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

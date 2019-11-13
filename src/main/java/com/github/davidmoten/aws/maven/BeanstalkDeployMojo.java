@@ -6,24 +6,12 @@ import java.util.Date;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
 
 @Mojo(name = "deploy")
 public final class BeanstalkDeployMojo extends AbstractMojo {
-
-    @Parameter(property = "awsAccessKey")
-    private String awsAccessKey;
-
-    @Parameter(property = "awsSecretAccessKey")
-    private String awsSecretAccessKey;
-
-    @Parameter(property = "serverId")
-    private String serverId;
 
     @Parameter(property = "applicationName")
     private String applicationName;
@@ -54,12 +42,6 @@ public final class BeanstalkDeployMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true)
     private MavenProject project;
-    
-    @Parameter(defaultValue="${settings}", readonly=true)
-    private Settings settings;
-
-    @Component
-    private SettingsDecrypter decrypter;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -72,8 +54,7 @@ public final class BeanstalkDeployMojo extends AbstractMojo {
         }
 
         BeanstalkDeployer deployer = new BeanstalkDeployer(getLog());
-        AwsKeyPair keyPair = Util.getAwsKeyPair(serverId, awsAccessKey, awsSecretAccessKey, settings, decrypter);
-        deployer.deploy(artifact, keyPair, region, applicationName,
+        deployer.deploy(artifact, region, applicationName,
                 environmentName, versionLabel, proxy);
     }
 
@@ -81,5 +62,4 @@ public final class BeanstalkDeployMojo extends AbstractMojo {
         // construct version label using application name and dateTime
         return applicationName + "_" + version + "_" + Util.formatDateTime(date);
     }
-
 }

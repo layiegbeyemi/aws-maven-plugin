@@ -13,15 +13,6 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 @Mojo(name = "deployLambda")
 public final class LambdaDeployMojo extends AbstractMojo {
 
-    @Parameter(property = "awsAccessKey")
-    private String awsAccessKey;
-
-    @Parameter(property = "awsSecretAccessKey")
-    private String awsSecretAccessKey;
-
-    @Parameter(property = "serverId")
-    private String serverId;
-
     @Parameter(property = "functionName")
     private String functionName;
 
@@ -49,20 +40,12 @@ public final class LambdaDeployMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true)
     private MavenProject project;
 
-    @Parameter(defaultValue="${settings}", readonly=true)
-    private Settings settings;
-
-    @Component
-    private SettingsDecrypter decrypter;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Proxy proxy = new Proxy(httpsProxyHost, httpsProxyPort, httpsProxyUsername,
                 httpsProxyPassword);
         LambdaDeployer deployer = new LambdaDeployer(getLog());
-        AwsKeyPair keys = Util.getAwsKeyPair(serverId, awsAccessKey, awsSecretAccessKey, settings,
-                decrypter);
-        deployer.deploy(keys, region, artifact, functionName, functionAlias, proxy);
+        deployer.deploy(region, artifact, functionName, functionAlias, proxy);
     }
 
 }

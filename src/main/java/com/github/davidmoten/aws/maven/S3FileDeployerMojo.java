@@ -5,24 +5,12 @@ import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
 
 @Mojo(name = "deployFileS3")
 public final class S3FileDeployerMojo extends AbstractMojo {
-
-    @Parameter(property = "awsAccessKey")
-    private String awsAccessKey;
-
-    @Parameter(property = "awsSecretAccessKey")
-    private String awsSecretAccessKey;
-
-    @Parameter(property = "serverId")
-    private String serverId;
 
     @Parameter(property = "region")
     private String region;
@@ -57,20 +45,13 @@ public final class S3FileDeployerMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true)
     private MavenProject project;
 
-    @Parameter(defaultValue = "${settings}", readonly = true)
-    private Settings settings;
-
-    @Component
-    private SettingsDecrypter decrypter;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         Proxy proxy = new Proxy(httpsProxyHost, httpsProxyPort, httpsProxyUsername, httpsProxyPassword);
 
         S3FileDeployer deployer = new S3FileDeployer(getLog());
-        AwsKeyPair keyPair = Util.getAwsKeyPair(serverId, awsAccessKey, awsSecretAccessKey, settings, decrypter);
-        deployer.deploy(keyPair, region, file, bucketName, objectName, proxy, create, awsKmsKeyId);
+        deployer.deploy(region, file, bucketName, objectName, proxy, create, awsKmsKeyId);
     }
 
 }

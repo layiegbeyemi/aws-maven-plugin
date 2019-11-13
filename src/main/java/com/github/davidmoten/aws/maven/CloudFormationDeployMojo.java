@@ -19,17 +19,8 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 @Mojo(name = "deployCf")
 public final class CloudFormationDeployMojo extends AbstractMojo {
 
-    @Parameter(property = "awsAccessKey")
-    private String awsAccessKey;
-
-    @Parameter(property = "awsSecretAccessKey")
-    private String awsSecretAccessKey;
-
     @Parameter(property = "region")
     private String region;
-
-    @Parameter(property = "serverId")
-    private String serverId;
 
     @Parameter(property = "stackName")
     private String stackName;
@@ -61,19 +52,11 @@ public final class CloudFormationDeployMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true)
     private MavenProject project;
 
-    @Parameter(defaultValue="${settings}", readonly=true)
-    private Settings settings;
-
-    @Component
-    private SettingsDecrypter decrypter;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Proxy proxy = new Proxy(httpsProxyHost, httpsProxyPort, httpsProxyUsername,
                 httpsProxyPassword);
         CloudFormationDeployer deployer = new CloudFormationDeployer(getLog());
-        AwsKeyPair keys = Util.getAwsKeyPair(serverId, awsAccessKey, awsSecretAccessKey, settings,
-                decrypter);
         byte[] bytes;
 
         if (templateUrl == null) {
@@ -91,7 +74,7 @@ public final class CloudFormationDeployMojo extends AbstractMojo {
         // docs. Not going to worry about detecting UTF-16 until someone
         // complains!
         String templateBody = new String(bytes, StandardCharsets.UTF_8);
-        deployer.deploy(keys, region, stackName, templateBody, parameters,
+        deployer.deploy(region, stackName, templateBody, parameters,
                 intervalSeconds, proxy, templateUrl);
     }
 
