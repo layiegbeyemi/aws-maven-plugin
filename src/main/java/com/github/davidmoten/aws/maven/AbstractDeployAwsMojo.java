@@ -1,5 +1,6 @@
 package com.github.davidmoten.aws.maven;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -25,7 +26,16 @@ abstract class AbstractDeployAwsMojo<Builder extends AwsSyncClientBuilder<Builde
     protected void execute(AWSCredentialsProvider awsCredentials, String region, Proxy proxy)
             throws MojoExecutionException, MojoFailureException {
         Client serviceClient = builder.withRegion(region)
-                .withCredentials(awsCredentials)
+                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                .withClientConfiguration(Util.createConfiguration(proxy))
+                .build();
+        execute(serviceClient);
+    }
+
+    protected void execute(String region, Proxy proxy)
+            throws MojoExecutionException, MojoFailureException {
+        Client serviceClient = builder.withRegion(region)
+                .withCredentials(new DefaultAWSCredentialsProviderChain())
                 .withClientConfiguration(Util.createConfiguration(proxy))
                 .build();
         execute(serviceClient);
